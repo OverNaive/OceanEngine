@@ -22,7 +22,7 @@ func (c *Client) SetAccessToken(accessToken string) {
 	c.accessToken = accessToken
 }
 
-func (c *Client) Get(ctx context.Context, gw string, req map[string]interface{}) (*ListResponse, error) {
+func (c *Client) GetList(ctx context.Context, gw string, req map[string]interface{}) (*ListResponse, error) {
 	// build query
 	query := EncodeQuery(req)
 	apiUrl := fmt.Sprintf("%s%s?%s", BaseUrl, gw, query)
@@ -45,6 +45,40 @@ func (c *Client) Get(ctx context.Context, gw string, req map[string]interface{})
 
 	// build resp
 	resp := new(ListResponse)
+	decoder := json.NewDecoder(httpResp.Body)
+	decoder.UseNumber()
+	if err := decoder.Decode(resp); err != nil {
+		return nil, err
+	}
+	if resp.IsError() {
+		return nil, errors.New(resp.ErrorMessage())
+	}
+	return resp, nil
+}
+
+func (c *Client) Get(ctx context.Context, gw string, req map[string]interface{}) (*DataResponse, error) {
+	// build query
+	query := EncodeQuery(req)
+	apiUrl := fmt.Sprintf("%s%s?%s", BaseUrl, gw, query)
+
+	// build httpReq
+	httpReq, err := http.NewRequestWithContext(ctx, "GET", apiUrl, nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.accessToken != "" {
+		httpReq.Header.Add("Access-Token", c.accessToken)
+	}
+
+	// build httpResp
+	httpResp, err := http.DefaultClient.Do(httpReq)
+	if err != nil {
+		return nil, err
+	}
+	defer httpResp.Body.Close()
+
+	// build resp
+	resp := new(DataResponse)
 	decoder := json.NewDecoder(httpResp.Body)
 	decoder.UseNumber()
 	if err := decoder.Decode(resp); err != nil {
