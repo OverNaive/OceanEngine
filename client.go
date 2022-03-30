@@ -51,7 +51,7 @@ func (c *Client) GetList(ctx context.Context, gw string, req map[string]interfac
 		return nil, err
 	}
 	if resp.IsError() {
-		return nil, errors.New(resp.ErrorMessage())
+		return resp, errors.New(resp.ErrorMessage())
 	}
 	return resp, nil
 }
@@ -85,7 +85,7 @@ func (c *Client) Get(ctx context.Context, gw string, req map[string]interface{})
 		return nil, err
 	}
 	if resp.IsError() {
-		return nil, errors.New(resp.ErrorMessage())
+		return resp, errors.New(resp.ErrorMessage())
 	}
 	return resp, nil
 }
@@ -120,7 +120,7 @@ func (c *Client) Post(ctx context.Context, gw string, req map[string]interface{}
 		return nil, err
 	}
 	if resp.IsError() {
-		return nil, errors.New(resp.ErrorMessage())
+		return resp, errors.New(resp.ErrorMessage())
 	}
 	return resp, nil
 }
