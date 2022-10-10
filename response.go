@@ -29,8 +29,9 @@ type DataResponse struct {
 type ListResponse struct {
 	BaseResponse
 	Data *struct {
-		List     []map[string]interface{} `json:"list,omitempty"`
-		PageInfo *struct {
+		List         []map[string]interface{} `json:"list,omitempty"`
+		CommentsList []map[string]interface{} `json:"comments_list,omitempty"`
+		PageInfo     *struct {
 			Page        int   `json:"page,omitempty"`
 			PageSize    int   `json:"page_size,omitempty"`
 			TotalNumber int64 `json:"total_number,omitempty"`
