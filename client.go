@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -25,7 +26,7 @@ func (c *Client) SetAccessToken(accessToken string) {
 func (c *Client) GetList(ctx context.Context, gw string, req map[string]interface{}) (*ListResponse, error) {
 	// build query
 	query := EncodeQuery(req)
-	apiUrl := fmt.Sprintf("%s%s?%s", BaseUrl, gw, query)
+	apiUrl := c.getApiUrl(gw, query)
 
 	// build httpReq
 	httpReq, err := http.NewRequestWithContext(ctx, "GET", apiUrl, nil)
@@ -59,7 +60,7 @@ func (c *Client) GetList(ctx context.Context, gw string, req map[string]interfac
 func (c *Client) Get(ctx context.Context, gw string, req map[string]interface{}) (*DataResponse, error) {
 	// build query
 	query := EncodeQuery(req)
-	apiUrl := fmt.Sprintf("%s%s?%s", BaseUrl, gw, query)
+	apiUrl := c.getApiUrl(gw, query)
 
 	// build httpReq
 	httpReq, err := http.NewRequestWithContext(ctx, "GET", apiUrl, nil)
@@ -93,7 +94,7 @@ func (c *Client) Get(ctx context.Context, gw string, req map[string]interface{})
 func (c *Client) Post(ctx context.Context, gw string, req map[string]interface{}) (*DataResponse, error) {
 	// build body
 	body := EncodeBody(req)
-	apiUrl := fmt.Sprintf("%s%s", BaseUrl, gw)
+	apiUrl := c.getApiUrl(gw, "")
 
 	// build httpReq
 	httpReq, err := http.NewRequestWithContext(ctx, "POST", apiUrl, bytes.NewReader(body))
@@ -123,4 +124,15 @@ func (c *Client) Post(ctx context.Context, gw string, req map[string]interface{}
 		return resp, errors.New(resp.ErrorMessage())
 	}
 	return resp, nil
+}
+
+func (c *Client) getApiUrl(gw string, query string) (apiUrl string) {
+	apiUrl = gw
+	if !strings.Contains(gw, "https") {
+		apiUrl = fmt.Sprintf("%s%s", BaseUrl, gw)
+	}
+	if query != "" {
+		apiUrl = fmt.Sprintf("%s?%s", apiUrl, query)
+	}
+	return
 }
