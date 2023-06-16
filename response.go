@@ -29,6 +29,7 @@ type DataResponse struct {
 type ListResponse struct {
 	BaseResponse
 	Data *struct {
+		Rows         []map[string]interface{} `json:"rows,omitempty"`
 		List         []map[string]interface{} `json:"list,omitempty"`
 		CommentsList []map[string]interface{} `json:"comments_list,omitempty"`
 		PageInfo     *struct {
