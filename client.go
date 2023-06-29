@@ -12,15 +12,17 @@ import (
 )
 
 type Client struct {
-	accessToken string
+	headers map[string]string
 }
 
 func NewClient() *Client {
-	return &Client{}
+	return &Client{
+		headers: make(map[string]string),
+	}
 }
 
-func (c *Client) SetAccessToken(accessToken string) {
-	c.accessToken = accessToken
+func (c *Client) SetHeader(key, value string) {
+	c.headers[key] = value
 }
 
 func (c *Client) GetList(ctx context.Context, gw string, req map[string]interface{}) (*ListResponse, error) {
@@ -33,8 +35,9 @@ func (c *Client) GetList(ctx context.Context, gw string, req map[string]interfac
 	if err != nil {
 		return nil, err
 	}
-	if c.accessToken != "" {
-		httpReq.Header.Add("Access-Token", c.accessToken)
+	
+	for k, v := range c.headers {
+		httpReq.Header.Add(k, v)
 	}
 
 	// build httpResp
@@ -67,8 +70,9 @@ func (c *Client) Get(ctx context.Context, gw string, req map[string]interface{})
 	if err != nil {
 		return nil, err
 	}
-	if c.accessToken != "" {
-		httpReq.Header.Add("Access-Token", c.accessToken)
+
+	for k, v := range c.headers {
+		httpReq.Header.Add(k, v)
 	}
 
 	// build httpResp
@@ -101,9 +105,12 @@ func (c *Client) Post(ctx context.Context, gw string, req map[string]interface{}
 	if err != nil {
 		return nil, err
 	}
-	httpReq.Header.Add("Content-Type", "application/json")
-	if c.accessToken != "" {
-		httpReq.Header.Add("Access-Token", c.accessToken)
+
+	if _, ok := c.headers["Content-Type"]; !ok {
+		c.headers["Content-Type"] = "application/json"
+	}
+	for k, v := range c.headers {
+		httpReq.Header.Add(k, v)
 	}
 
 	// build httpResp
