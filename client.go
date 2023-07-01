@@ -135,7 +135,7 @@ func (c *Client) Post(ctx context.Context, gw string, req map[string]interface{}
 
 func (c *Client) getApiUrl(gw string, query string) (apiUrl string) {
 	apiUrl = gw
-	if !strings.Contains(gw, "https") {
+	if !strings.HasPrefix(gw, "https") && !strings.HasPrefix(gw, "http") {
 		apiUrl = fmt.Sprintf("%s%s", BaseUrl, gw)
 	}
 	if query != "" {
